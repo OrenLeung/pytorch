@@ -1385,6 +1385,18 @@ class BuiltinVariable(VariableTracker):
                 tx,
                 op(left.as_proxy(), right.as_proxy()),
             )
+        
+        if isinstance(right, TensorVariable):
+            from .builder import wrap_fx_proxy_cls
+
+            if op not in supported_tensor_comparison_ops.values():
+                _unimplemented()
+
+            return wrap_fx_proxy_cls(
+                type(right),  # handle Ndarrays and Tensors
+                tx,
+                op(left.as_proxy(), right.as_proxy()),
+            )
 
         if isinstance(left, SymNodeVariable) or isinstance(right, SymNodeVariable):
             if op not in supported_tensor_comparison_ops.values():
